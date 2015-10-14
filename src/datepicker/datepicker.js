@@ -17,7 +17,13 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
   yearRange: 20,
   minDate: null,
   maxDate: null,
-  shortcutPropagation: false
+  shortcutPropagation: false,
+  minMonth: 0,
+  minYear: 0,
+  maxMonth: 0,
+  maxYear: 0,
+  disabledStart: {},
+  disabledEnd: {}
 })
 
 .controller('UibDatepickerController', ['$scope', '$attrs', '$parse', '$interpolate', '$log', 'dateFilter', 'uibDatepickerConfig', '$datepickerSuppressError', function($scope, $attrs, $parse, $interpolate, $log, dateFilter, datepickerConfig, $datepickerSuppressError) {
@@ -45,7 +51,7 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
     }
   });
 
-  angular.forEach(['minMode', 'maxMode'], function(key) {
+  angular.forEach(['minMode', 'maxMode','minMonth', 'minYear', 'maxMonth', 'maxYear', 'disabledStart', 'disabledEnd'], function(key) {
     if ($attrs[key]) {
       $scope.$parent.$watch($parse($attrs[key]), function(value) {
         self[key] = angular.isDefined(value) ? value : $attrs[key];
@@ -169,9 +175,40 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
   $scope.move = function(direction) {
     var year = self.activeDate.getFullYear() + direction * (self.step.years || 0),
         month = self.activeDate.getMonth() + direction * (self.step.months || 0);
-    self.activeDate.setFullYear(year, month, 1);
-    self.refreshView();
+
+    var newYear = new Date();
+    newYear = newYear.setFullYear(year, month, 1);
+
+    var disabledStart = new Date(),
+        disabledEnd = new Date(),
+        disabledStart = disabledStart.setFullYear(self.disabledStart.year, self.disabledStart.month, self.disabledStart.day),
+        disabledEnd = disabledEnd.setFullYear(self.disabledEnd.year, self.disabledEnd.month, self.disabledEnd.day),
+        timeDiff = Math.abs(disabledEnd - disabledStart),
+        diffDayCount = Math.ceil(timeDiff / (1000 * 3600 * 24)),
+        diffDay = Math.ceil(diffDayCount / 31);
+    if (direction > 0 && newYear >= disabledStart) {
+        if (newYear <= disabledEnd) {
+            month = month + (direction*diffDay) * (self.step.months || 0);
+        }
+    } else if (direction < 0 && newYear <= disabledEnd) {
+        if (newYear >= disabledStart) {
+            month = month + (direction*diffDay) * (self.step.months || 0);
+        }
+    }
+
+    if ((self.minMonth <= month && self.minYear <= year) || (self.maxMonth >= month && self.maxYear >= year)) {
+        self.activeDate.setFullYear(year, month, 1);
+        self.refreshView();
+    }
   };
+
+  $scope.checkMin = function () {
+      return self.activeDate.getMonth() === self.minMonth && self.activeDate.getFullYear() === self.minYear;
+  }
+
+  $scope.checkMax = function () {
+      return self.activeDate.getMonth() === self.maxMonth && self.activeDate.getFullYear() === self.maxYear;
+  }
 
   $scope.toggleMode = function(direction) {
     direction = direction || 1;
@@ -599,7 +636,7 @@ function(scope, element, attrs, $compile, $parse, $document, $rootScope, $positi
       });
     }
 
-    angular.forEach(['minMode', 'maxMode', 'minDate', 'maxDate', 'datepickerMode', 'initDate', 'shortcutPropagation'], function(key) {
+    angular.forEach(['minMode', 'maxMode', 'minDate', 'maxDate', 'datepickerMode', 'initDate', 'shortcutPropagation', 'minMonth', 'minYear', 'maxMonth', 'maxYear', 'disabledStart', 'disabledEnd'], function(key) {
       if (attrs[key]) {
         var getAttribute = $parse(attrs[key]);
         scope.$parent.$watch(getAttribute, function(value) {
