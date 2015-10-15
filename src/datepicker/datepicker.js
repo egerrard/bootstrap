@@ -180,10 +180,10 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
     newYear = newYear.setFullYear(year, month, 1);
 
     var disabledStart = new Date(),
-        disabledEnd = new Date(),
-        disabledStart = disabledStart.setFullYear(self.disabledStart.year, self.disabledStart.month, self.disabledStart.day),
-        disabledEnd = disabledEnd.setFullYear(self.disabledEnd.year, self.disabledEnd.month, self.disabledEnd.day),
-        timeDiff = Math.abs(disabledEnd - disabledStart),
+        disabledEnd = new Date();
+    disabledStart = disabledStart.setFullYear(self.disabledStart.year, self.disabledStart.month, self.disabledStart.day),
+    disabledEnd = disabledEnd.setFullYear(self.disabledEnd.year, self.disabledEnd.month, self.disabledEnd.day);
+    var timeDiff = Math.abs(disabledEnd - disabledStart),
         diffDayCount = Math.ceil(timeDiff / (1000 * 3600 * 24)),
         diffDay = Math.ceil(diffDayCount / 31);
     if (direction > 0 && newYear >= disabledStart) {
@@ -204,11 +204,11 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
 
   $scope.checkMin = function () {
       return self.activeDate.getMonth() === self.minMonth && self.activeDate.getFullYear() === self.minYear;
-  }
+  };
 
   $scope.checkMax = function () {
       return self.activeDate.getMonth() === self.maxMonth && self.activeDate.getFullYear() === self.maxYear;
-  }
+  };
 
   $scope.toggleMode = function(direction) {
     direction = direction || 1;
