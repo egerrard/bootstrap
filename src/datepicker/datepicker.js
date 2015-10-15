@@ -179,10 +179,11 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
     var newYear = new Date();
     newYear = newYear.setFullYear(year, month, 1);
 
-    var disabledStart = new Date(),
-        disabledEnd = new Date();
-    disabledStart = disabledStart.setFullYear(self.disabledStart.year, self.disabledStart.month, self.disabledStart.day),
+    var disabledStart = new Date();
+    disabledStart = disabledStart.setFullYear(self.disabledStart.year, self.disabledStart.month, self.disabledStart.day);
+    var disabledEnd = new Date();
     disabledEnd = disabledEnd.setFullYear(self.disabledEnd.year, self.disabledEnd.month, self.disabledEnd.day);
+
     var timeDiff = Math.abs(disabledEnd - disabledStart),
         diffDayCount = Math.ceil(timeDiff / (1000 * 3600 * 24)),
         diffDay = Math.ceil(diffDayCount / 31);
